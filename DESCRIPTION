@@ -1,0 +1,9 @@
+Package: IOL
+Type: Package
+Title: Ophthalmology IOL power calculations
+Version: 0.1.0
+Date: 2013-10-30
+Author: Eric N. Brown
+Maintainer: Eric N. Brown <eric.n.brown@gmail.com>
+Description: More about what it does (maybe more than one line)
+License: AGPL-3
