@@ -21,10 +21,10 @@ SRK.II.Power <- function(L, K, A, ELP) {
     args$A <- A
   }
   A2 <- A
-  if (A < 20) A2 <- A + 3
-  if (A >= 20 & A < 21) A2 <- A + 2
-  if (A >= 21 & A < 22) A2 <- A + 1
-  if (A >= 24.5) A2 <- A - 0.5
+  if (L < 20) A2 <- A + 3
+  if (L >= 20 & L < 21) A2 <- A + 2
+  if (L >= 21 & L < 22) A2 <- A + 1
+  if (L >= 24.5) A2 <- A - 0.5
   P <- A2 - 2.5 * L - 0.9 * K
   attr(P, 'parameters') <- args
   return(P)
