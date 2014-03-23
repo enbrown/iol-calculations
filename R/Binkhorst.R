@@ -21,15 +21,21 @@
 #' @seealso \code{\link{Power}}, \code{\link{Binkhorst.adjusted.Power}}
 #' @family Power
 Binkhorst.Power <- function(L, R, K, cornea_n, ELP) {
-  args <- list(L = L, K = K)
+  if (missing(L) || missing(ELP)) {
+    stop("Axial length (L) and effective lens position (ELP) required for Binkhorst equation.")
+  }
+  args <- list(L = L, ELP = ELP)
   if (missing(R) || ! is.finite(R)) {
-    if (missing(cornea_n) || is.finite(cornea_n)) {
-      cornea_n <- Constants$Biometry$corneal_index
-      warning("Using standard corneal index of refraction to convert K to R for Binkhorst equation: ", cornea_n)
+    if (missing(K) || ! is.numeric(K) || ! is.finite(K) || K <= 0) {
+      stop("Either K or R required for Binkhorst equation.")
     }
-    R <- 1000 * (cornea_n - 1) / K
-    args$K <- R
+    args$K <- K
+    if (missing(cornea_n) || is.finite(cornea_n)) {
+      cornea_n <- 4/3
+      warning("Using corneal index of refraction to convert K to R for Binkhorst equation: ", cornea_n)
+    }
     args$cornea_n <- cornea_n
+    R <- 1000 * (cornea_n - 1) / K
     warning("Convert K to R for Binkhorst equation: ", R, "mm")
   } else {
     args$R <- R
@@ -66,15 +72,21 @@ Power.functions$Binkhorst <- Binkhorst.Power
 #' @seealso \code{\link{Power}}, \code{\link{Binkhorst.Power}}
 #' @family Power
 Binkhorst.adjusted.Power <- function(L, R, K, cornea_n, ELP) {
+  if (missing(L) || missing(ELP)) {
+    stop("Axial length (L) and effective lens position (ELP) required for Binkhorst equation.")
+  }
   args <- list(L = L, ELP = ELP)
   if (missing(R) || ! is.finite(R)) {
-    if (missing(cornea_n) || ! is.finite(cornea_n)) {
-      cornea_n <- Constants$Biometry$corneal_index
-      warning("Using standard corneal index of refraction to convert K to R for Binkhorst's adjusted equation: ", cornea_n)
+    if (missing(K) || ! is.numeric(K) || ! is.finite(K) || K <= 0) {
+      stop("Either K or R required for Binkhorst equation.")
     }
-    R <- 1000 * (cornea_n - 1) / K
     args$K <- K
+    if (missing(cornea_n) || ! is.finite(cornea_n)) {
+      cornea_n <- 4/3
+      warning("Using corneal index of refraction to convert K to R for Binkhorst's adjusted equation: ", cornea_n)
+    }
     args$cornea_n <- cornea_n
+    R <- 1000 * (cornea_n - 1) / K
     warning("Convert K to R for Binkhorst's adjusted equation: ", R, "mm")
   } else {
     args$R <- R
