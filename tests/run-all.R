@@ -1,4 +1,2 @@
 library(testthat)
-library(IOL)
-
-test_package("IOL")
+test_check("IOL")
