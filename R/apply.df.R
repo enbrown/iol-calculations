@@ -16,7 +16,6 @@ apply.df <- function(X, FUN, NAME, which = NULL) {
     if (! missing(which) && 'which' %in% names(args)) args$which <- which
     # Call the function
     result <- do.call(FUN, args)
-    #print(str(result))
     # Convert the function results into a data.frame
     args <- list(name.FUN = names(result),
                  params.FUN = attr(result, 'function.arguments'),
@@ -28,8 +27,7 @@ apply.df <- function(X, FUN, NAME, which = NULL) {
                             NAME)
     }
     df.new <- do.call(data.frame, args)
-    #print(str(df.new))
-    # 
+
     df.new <- merge(values, df.new,
                     by = NULL, all = TRUE)
     if (nrow(df) == 0) {
