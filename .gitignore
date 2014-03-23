@@ -1,3 +1,11 @@
+<<<<<<< HEAD
 .Rproj.user
 .Rhistory
 .RData
+=======
+# History files
+.Rhistory
+
+# Example code in package build process
+*-Ex.R
+>>>>>>> 5c08f39f6324742867fedbccea55a808e780f05a
