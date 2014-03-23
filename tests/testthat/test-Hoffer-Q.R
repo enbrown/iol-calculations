@@ -67,19 +67,14 @@ test_that("Hoffer-Q Equation (internal functions)", {
   iol <- IOL:::Hoffer.Q.Power(L = L, K = 337.5 / R, ELP = elp)
   expect_equivalent(round(iol, digits=2), -0.91)
   
-  # Very long eye
-  L <- 32; R <- 7; pACD <- 4.96
-  elp <- IOL:::Hoffer.Q.ELP(L = L, K = 337.5 / R, pACD = pACD)
-  #elp <- 7.558
-  iol <- IOL:::Hoffer.Q.Power(L = L, K = 337.5 / R, ELP = elp)
-  #expect_equivalent(round(iol, digits=2), -11.69,
-  #                  info = "Possible explaination: ULIB site gives wrong(?) ELP for long eyes.")
+  # Very long eye (verified using Hoffer Programs Ver 1.5a)
+  L <- 32; K <- 48.21; pACD <- 4.96
+  elp <- IOL:::Hoffer.Q.ELP(L = L, K = K, pACD = pACD)
+  iol <- IOL:::Hoffer.Q.Power(L = L, K = K, ELP = elp)
+  expect_equivalent(round(iol, digits=2), -11.03)
   
-  L <- 32; R <- 7; pACD <- 5.59
-  elp <- IOL:::Hoffer.Q.ELP(L = L, K = 337.5 / R, pACD = pACD)
-  #elp <- 8.189
-  iol <- IOL:::Hoffer.Q.Power(L = L, K = 337.5 / R, ELP = elp)
-  #expect_equivalent(round(iol, digits=2), -12.39,
-  #                  info = "Possible explaination: ULIB site gives wrong(?) ELP for long eyes.")
-  
+  L <- 32; K <- 48.21; pACD <- 5.59
+  elp <- IOL:::Hoffer.Q.ELP(L = L, K = K, pACD = pACD)
+  iol <- IOL:::Hoffer.Q.Power(L = L, K = K, ELP = elp)
+  expect_equivalent(round(iol, digits=2), -11.67)
 })
