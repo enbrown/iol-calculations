@@ -1,4 +1,19 @@
-ELP.functions$SRK.T <- function(L, K, A, ACD) {
+#' SRK/T Formula for IOL Effective Lens Position
+#' 
+#' Calculate IOL effective lens position for emmetropia given axial length, 
+#' corenal curvature, and IOL A-constant.
+#' 
+#' Note: A warning is provided if the combination of corneal curvature and axial length
+#' produces an unexpected corneal height.
+#' 
+#' @param L axial length of the eye in millimeters (mm)
+#' @param K corneal power (D)
+#' @param ACD IOL anterior chamber depth constant (mm) 
+#' @param A IOL A-constant (D) used to calculate equivalent ACD
+#' @return Effective lens position of IOL (mm)
+#' @seealso \code{\link{ELP}}
+#' @family ELP
+SRK.T.ELP <- function(L, K, ACD, A) {
   args <- list(L = L, K = K)
   if (missing(ACD) || ! is.finite(ACD)) {
     if (! missing(A) && is.finite(A)) {
@@ -36,8 +51,20 @@ ELP.functions$SRK.T <- function(L, K, A, ACD) {
   attr(result, 'parameters') <- args
   return(result)
 }
+ELP.functions$SRK.T <- SRK.T.ELP
 
-Power.functions$SRK.T <- function(L, K, ELP) {
+#' SRK/T Formula for IOL Power
+#' 
+#' Calculate IOL power for emmetropia given axial length, 
+#' corenal curvature, and effective lens position.
+#' 
+#' @param L axial length of the eye in millimeters (mm)
+#' @param K corneal power (D)
+#' @param ELP IOL effective lens position (mm)
+#' @return Power of IOL (D)
+#' @seealso \code{\link{Power}}
+#' @family Power
+SRK.T.Power <- function(L, K, ELP) {
   args <- list(L = L, K = K, ELP = ELP)
   na <- 1.336
   nc <- 1.333
@@ -50,3 +77,4 @@ Power.functions$SRK.T <- function(L, K, ELP) {
   attr(P, 'parameters') <- args
   return(P)
 }
+Power.functions$SRK.T <- SRK.T.Power

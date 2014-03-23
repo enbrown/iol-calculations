@@ -1,3 +1,5 @@
+#' Constants for IOL calculations and biometry
+#'
 Constants <- list(
   IOL = list(A_to_pACD_a0 = -63.896,  # From Holladay conversion 1988
              A_to_pACD_a1 = 0.58357,

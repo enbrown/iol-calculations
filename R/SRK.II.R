@@ -1,4 +1,16 @@
-Power.functions$SRK.II <- function(L, K, A, ELP) {
+#' SRK-II Formula for IOL Power
+#' 
+#' Calculate IOL power for emmetropia given axial length, 
+#' corenal curvature, and IOL A-constant.
+#' 
+#' @param L axial length of the eye in millimeters (mm)
+#' @param K corneal power (D)
+#' @param A IOL A-constant (D)
+#' @param ELP IOL effective lens position (mm) used to calculate equivalent A-constant
+#' @return Power of IOL (D)
+#' @seealso \code{\link{Power}}
+#' @family Power
+SRK.II.Power <- function(L, K, A, ELP) {
   args <- list(L = L, K = K)
   if (missing(A) || ! is.finite(A)) {
     print(str(match.call()))
@@ -17,3 +29,4 @@ Power.functions$SRK.II <- function(L, K, A, ELP) {
   attr(P, 'parameters') <- args
   return(P)
 }
+Power.functions$SRK.II <- SRK.II.Power

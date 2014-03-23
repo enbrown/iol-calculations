@@ -19,6 +19,7 @@
 #'   formula requested.
 #' @export
 #' @seealso \code{\link{Power}}
+#' @family ELP
 #' @note If the some of the IOL constants A, pACD, or S are not provided, it may
 #'   be derived from those given. A warning is generally produced when this 
 #'   conversion is performed.
@@ -56,7 +57,9 @@
 ELP <- function(L, K, R = NA, cornea_n = NA,
                               A = NA, pACD = NA, S = NA,
                               which = 'modern') {
-  # Get the ELP using each equation
+  cl <- match.call()
+  
+  # Determine which equations to use
   if ('all' %in% which) {
     which <- names(Power.functions)
     which <- which[which != 'all']
@@ -65,6 +68,7 @@ ELP <- function(L, K, R = NA, cornea_n = NA,
   }
   which <- unique(which)
   
+  # Get the ELP using each equation
   result <- list()
   for (i in which) {
     if (i == 'Holladay') {
@@ -81,8 +85,13 @@ ELP <- function(L, K, R = NA, cornea_n = NA,
                                         S = S, A = A, pACD = pACD)
     } else if (i == 'SRK.T') {
       result[[i]] <- ELP.functions[[i]](L = L, K = K, A = A, ACD = pACD)
+    } else if (i == 'all' || i == 'modern') {
+      # do nothing
+    } else {
+      warn("Unknown ELP method requested.")
     }
   }
+  
   # Remember the names of the ELP functions
   functions <- names(result)
   function.arguments <- vector(mode = 'character')
@@ -94,7 +103,19 @@ ELP <- function(L, K, R = NA, cornea_n = NA,
                                      collapse=', ')
   }
   names(function.arguments) <- NULL
+  attr(ELP, 'call') <- cl
   attr(ELP, 'function') <- functions
   attr(ELP, 'function.arguments') <- function.arguments
+  class(ELP) <- 'ELP'
   return(ELP)
+}
+
+#' @export
+print.ELP <- function(x, ...) {
+  # Remove all attributes other than names
+  n <- names(x)
+  attributes(x) <- NULL
+  names(x) <- n
+  # Print the object
+  print(unclass(x))
 }

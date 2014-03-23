@@ -18,6 +18,7 @@
 #'   formula requested
 #' @export
 #' @seealso \code{\link{ELP}}
+#' @family Power
 #' @author Eric N. Brown \email{eric.n.brown@@gmail.com}
 Power <- function(L, K, A, ELP, Rx = 0, V = 13, which = 'all') {
   result <- list()
@@ -27,6 +28,7 @@ Power <- function(L, K, A, ELP, Rx = 0, V = 13, which = 'all') {
   }
   if ('modern' %in% which) {
     which <- c(which, 'SRK.T', 'Holladay.1', 'Hoffer.Q')
+    which <- which[which != 'modern']
   }
   which <- unique(which)
   for (i in which) {
@@ -48,7 +50,6 @@ Power <- function(L, K, A, ELP, Rx = 0, V = 13, which = 'all') {
   P <- vector(mode = 'numeric')
   for (i in functions) {
     P[[i]] <- result[[i]]
-    #print(str(result[[i]]))
     attr(P,'parameters')[[i]] <- attr(result[[i]],'parameters')
     function.arguments[[i]] <- paste(names(attr(result[[i]],'parameters')),
                                      collapse=', ')
@@ -56,5 +57,16 @@ Power <- function(L, K, A, ELP, Rx = 0, V = 13, which = 'all') {
   names(function.arguments) <- NULL
   attr(P, 'function') <- functions
   attr(P, 'function.arguments') <- function.arguments
+  class(P) <- 'Power'
   return(P)
+}
+
+#' @export
+print.Power <- function(x, ...) {
+  # Remove all attributes other than names
+  n <- names(x)
+  attributes(x) <- NULL
+  names(x) <- n
+  # Print the object
+  print(unclass(x))
 }

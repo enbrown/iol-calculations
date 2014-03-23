@@ -1,0 +1,10 @@
+bibentry("Manual",
+   title = "IOL Calculator for R",
+   author = person("Eric N. Brown"),
+   year   = version$year,
+   # url    = "http://www.R-project.org/",
+
+   mheader = "To cite R in publications use:",
+
+   mfooter = paste("Please also cite R when using this package")
+)

@@ -1,4 +1,19 @@
-ELP.functions$Hoffer.Q <- function(L, K, A, pACD) {
+#' Hoffer-Q Formula for Effective Lens Position
+#' 
+#' Calculate IOL effective lens position for emmetropia given axial length, 
+#' corenal curvature, and lens A-constant or pACD constant.
+#' 
+#' Note: If the pACD constant, \code{pACD} for the lens is not provided, it is calculated from
+#' the lens A-constant, \code{A}, using the Holladay approximation.
+#' 
+#' @param L length of the eye in millimeters (mm)
+#' @param K average corneal curvature of the eye in diopters (D)
+#' @param pACD IOL personalized ACD constant (mm)
+#' @param A IOL A constant (D) used to determine pACD
+#' @return ELP in mm
+#' @seealso \code{\link{ELP}}
+#' @family ELP
+Hoffer.Q.ELP <- function(L, K, pACD, A) {
   args <- list(L = L, K = K)
   if (missing(pACD) || ! is.finite(pACD)) {
     pACD <- ELP.functions$Holladay(A)
@@ -26,8 +41,22 @@ ELP.functions$Hoffer.Q <- function(L, K, A, pACD) {
   attr(result, 'parameters') <- args
   return(result)
 }
+ELP.functions$Hoffer.Q <- Hoffer.Q.ELP
 
-Power.functions$Hoffer.Q <- function(L, K, ELP, Rx = 0, V = 13) {
+#' Hoffer-Q Formula for Emmetropic IOL Power
+#' 
+#' Calculate IOL power for emmetropia given axial length, 
+#' corenal curvature, and effective lens position.
+#' 
+#' @param L length of the eye in millimeters (mm)
+#' @param K average corneal curvature of the eye in diopters (D)
+#' @param ELP IOL effective lens position (mm)
+#' @param Rx resulting refractive error (D), defaults to 0 D
+#' @param V resulting refractive error vertex distance (mm), defaults to 13 mm
+#' @return Power of emmetropic IOL (D)
+#' @seealso \code{\link{Power}}
+#' @family Power
+Hoffer.Q.Power <- function(L, K, ELP, Rx = 0, V = 13) {
   args <- list(L = L, K = K, ELP = ELP, Rx = Rx, V = V)
   R <- Rx / (1 - 0.012 * Rx)
   P <- 1336 / (L - ELP - 0.05) -
@@ -36,3 +65,4 @@ Power.functions$Hoffer.Q <- function(L, K, ELP, Rx = 0, V = 13) {
   attr(P, 'parameters') <- args
   return(P)
 }
+Power.functions$Hoffer.Q <- Hoffer.Q.Power
