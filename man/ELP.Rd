@@ -3,8 +3,8 @@
 \alias{ELP}
 \title{Calculate Effective Lens Position (ELP) from Biometry and IOL Data}
 \usage{
-ELP(L, K, R = NA, cornea_n = NA, A = NA, pACD = NA, S = NA,
-  which = "modern")
+ELP(L, K, R = NA, cornea_n = NA, ACD = NA, A = NA, pACD = NA,
+  S = NA, a0 = NA, a1, a2, which = "modern")
 }
 \arguments{
   \item{L}{length of the eye in millimeters (mm)}
@@ -16,11 +16,19 @@ ELP(L, K, R = NA, cornea_n = NA, A = NA, pACD = NA, S = NA,
 
   \item{cornea_n}{effective corneal index of refraction}
 
-  \item{A}{IOL A constant}
+  \item{ACD}{ultrasound anterior chamber depth (mm)}
 
-  \item{pACD}{IOL pACD constant}
+  \item{A}{IOL A constant (D)}
+
+  \item{pACD}{IOL pACD constant (mm)}
 
   \item{S}{IOL surgeon factor constant}
+
+  \item{a0}{Haigis formula a0 lens constant (mm)}
+
+  \item{a1}{Haigis formula a1 lens constant}
+
+  \item{a2}{Haigis formula a2 lens constant}
 
   \item{which}{string vector specifying which ELP formulas
   to use}

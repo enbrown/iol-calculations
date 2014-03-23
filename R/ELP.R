@@ -11,9 +11,13 @@
 #' @param K average corneal curvature of the eye in diopters (D)
 #' @param R average corneal radius in millimeters (mm)
 #' @param cornea_n effective corneal index of refraction
-#' @param A IOL A constant
-#' @param pACD IOL pACD constant
+#' @param ACD ultrasound anterior chamber depth (mm)
+#' @param A IOL A constant (D)
+#' @param pACD IOL pACD constant (mm)
 #' @param S IOL surgeon factor constant
+#' @param a0 Haigis formula a0 lens constant (mm)
+#' @param a1 Haigis formula a1 lens constant
+#' @param a2 Haigis formula a2 lens constant
 #' @param which string vector specifying which ELP formulas to use
 #' @return Named numeric vector of effective lens position (in mm) for each ELP 
 #'   formula requested.
@@ -54,42 +58,53 @@
 #' # formula requires the surgeon factor, the A constant will be ignored
 #' (elp <- ELP(L = 24, K = 44, A = 118.4, S = 1.45, which = 'Holladay.1'))
 #' attr(elp, 'parameters')$Holladay.1
-ELP <- function(L, K, R = NA, cornea_n = NA,
-                              A = NA, pACD = NA, S = NA,
-                              which = 'modern') {
+ELP <- function(L, 
+                K, R = NA, cornea_n = NA,
+                ACD = NA,
+                A = NA, pACD = NA, S = NA, a0 = NA, a1, a2,
+                which = 'modern') {
   cl <- match.call()
   
   # Determine which equations to use
   if ('all' %in% which) {
     which <- names(Power.functions)
-    which <- which[which != 'all']
   } else if ('modern' %in% which) {
-    which <- c(which, 'SRK.T', 'Hoffer.Q', 'Holladay.1')
+    which <- c(which, 'SRK.T', 'Haigis', 'Hoffer.Q', 'Holladay.1')
   }
   which <- unique(which)
+  which <- which[! which %in% c('all', 'modern')]
   
   # Get the ELP using each equation
   result <- list()
   for (i in which) {
-    if (i == 'Holladay') {
-      result[[i]] <- ELP.functions[[i]](A = A)
-    } else if (i == 'Haigis') {
-      result[[i]] <- ELP.functions[[i]](pACD = pACD)
-    } else if (i == 'Hoffer') {
-      result[[i]] <- ELP.functions[[i]](L = L, ACD = pACD, A = A)
-    } else if (i == 'Hoffer.Q') {
-      result[[i]] <- ELP.functions[[i]](L = L, K = K, A = A, pACD = pACD)
-    } else if (i == 'Holladay.1') {
-      result[[i]] <- ELP.functions[[i]](L = L, 
-                                        R = R, cornea_n = cornea_n, K = K,
-                                        S = S, A = A, pACD = pACD)
-    } else if (i == 'SRK.T') {
-      result[[i]] <- ELP.functions[[i]](L = L, K = K, A = A, ACD = pACD)
-    } else if (i == 'all' || i == 'modern') {
-      # do nothing
-    } else {
-      warn("Unknown ELP method requested.")
+    if (is.null(ELP.functions[[i]])) {
+      warning("Unknown ELP method requested: ", i, ".")
+      next
     }
+    args <- names(cl) %in% names(formals(ELP.functions[[i]]))
+    args <- as.list(cl)[args]
+    result[[i]] <- do.call(ELP.functions[[i]], args)
+#     if (i == 'Holladay') {
+#       result[[i]] <- ELP.functions[[i]](A = A)
+#     } else if (i == 'Haigis') {
+#       args <- names(cl) %in% names(formals(ELP.functions[[i]]))
+#       args <- as.list(cl)[args]
+#       result[[i]] <- do.call(ELP.functions[[i]], args)
+#     } else if (i == 'Hoffer') {
+#       result[[i]] <- ELP.functions[[i]](L = L, ACD = pACD, A = A)
+#     } else if (i == 'Hoffer.Q') {
+#       result[[i]] <- ELP.functions[[i]](L = L, K = K, A = A, pACD = pACD)
+#     } else if (i == 'Holladay.1') {
+#       result[[i]] <- ELP.functions[[i]](L = L, 
+#                                         R = R, cornea_n = cornea_n, K = K,
+#                                         S = S, A = A, pACD = pACD)
+#     } else if (i == 'SRK.T') {
+#       result[[i]] <- ELP.functions[[i]](L = L, K = K, A = A, ACD = pACD)
+#     } else if (i == 'all' || i == 'modern') {
+#       # do nothing
+#     } else {
+#       warning("Unknown ELP method requested.")
+#     }
   }
   
   # Remember the names of the ELP functions

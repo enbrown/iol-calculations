@@ -3,20 +3,41 @@
 \alias{Haigis.ELP}
 \title{Haigis Formula for Effective Lens Position}
 \usage{
-Haigis.ELP(pACD)
+Haigis.ELP(L, ACD = 3.37, a0, a1 = 0.4, a2 = 0.1, pACD, A)
 }
 \arguments{
+  \item{L}{ultrasound axial length (mm)}
+
+  \item{ACD}{ultrasound anterior chamber depth (mm)}
+
+  \item{a0}{Haigis a0 lens constant (mm)}
+
+  \item{a1}{Haigis a1 lens constant (unitless, defaults to
+  0.4)}
+
+  \item{a2}{Haigis a2 lens constant (unitless, defaults to
+  0.1)}
+
   \item{pACD}{personalized ACD (mm) lens constant}
+
+  \item{A}{SRK A lens constant (D)}
 }
 \value{
 ELP in mm
 }
 \description{
 Calculate IOL effective lens position for emmetropia given
-personalized lens-constant anterior chamber depth (pACD).
+axial length (L), anterior chamber depth (ACD), and a lens
+constant (a0, pACD, or A must be supplied.) If pACD is
+given, it is converted to an approximate a0 constant. If A
+is given, it is first convert to pACD and then to an
+approximate a0 constant.
 }
 \details{
 Note: Currently this is just the provided pACD constant.
+}
+\references{
+\url{http://www.augenklinik.uni-wuerzburg.de/uslab/ioltxt/haie.htm}
 }
 \seealso{
 \code{\link{ELP}}
