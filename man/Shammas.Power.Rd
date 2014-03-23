@@ -33,8 +33,8 @@ ultrasound. For contact ultrasound, add 0.24 mm.
 Other Power: \code{\link{Binkhorst.Power}};
 \code{\link{Binkhorst.adjusted.Power}};
 \code{\link{Colenbrander.Power}};
-\code{\link{Fyodorov.Power}}; \code{\link{Hoffer.Power}};
-\code{\link{Hoffer.Q.Power}};
+\code{\link{Fyodorov.Power}}; \code{\link{Haigis.Power}};
+\code{\link{Hoffer.Power}}; \code{\link{Hoffer.Q.Power}};
 \code{\link{Holladay.1.Power}};
 \code{\link{Holladay.Power}}; \code{\link{Power}};
 \code{\link{SRK.II.Power}}; \code{\link{SRK.Power}};

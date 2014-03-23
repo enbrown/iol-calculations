@@ -27,8 +27,8 @@ corneal power, and effective lens position.
 
 Other Power: \code{\link{Binkhorst.Power}};
 \code{\link{Binkhorst.adjusted.Power}};
-\code{\link{Fyodorov.Power}}; \code{\link{Hoffer.Power}};
-\code{\link{Hoffer.Q.Power}};
+\code{\link{Fyodorov.Power}}; \code{\link{Haigis.Power}};
+\code{\link{Hoffer.Power}}; \code{\link{Hoffer.Q.Power}};
 \code{\link{Holladay.1.Power}};
 \code{\link{Holladay.Power}}; \code{\link{Power}};
 \code{\link{SRK.II.Power}}; \code{\link{SRK.Power}};
