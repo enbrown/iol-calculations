@@ -45,8 +45,9 @@ taken as a ray intersecting in-to or out-of the circle.
 }
 \seealso{
 Other optics: \code{\link{Circle}};
-\code{\link{IntersectLC}}; \code{\link{Line}};
-\code{\link{Point}}; \code{\link{RefractLL}};
+\code{\link{IntersectLC}}; \code{\link{IntersectLV}};
+\code{\link{Line}}; \code{\link{Point}};
+\code{\link{RefractLL}}; \code{\link{RefractThinLens}};
 \code{\link{angle}}; \code{\link{center}};
 \code{\link{length.Line}}; \code{\link{normalize}};
 \code{\link{orthogonal}}; \code{\link{plot.Circle}};

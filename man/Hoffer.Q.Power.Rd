@@ -3,7 +3,7 @@
 \alias{Hoffer.Q.Power}
 \title{Hoffer-Q Formula for Emmetropic IOL Power}
 \usage{
-Hoffer.Q.Power(L, K, ELP, Rx = 0, V = 13)
+Hoffer.Q.Power(L, K = 337.5/R, R, ELP, Rx = 0, V = 13)
 }
 \arguments{
   \item{L}{length of the eye in millimeters (mm)}

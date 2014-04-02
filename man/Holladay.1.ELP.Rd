@@ -3,20 +3,20 @@
 \alias{Holladay.1.ELP}
 \title{Holladay 1 Formula for Effective Lens Position}
 \usage{
-Holladay.1.ELP(L, R, S, K, cornea_n, A, pACD)
+Holladay.1.ELP(L, R, K, cornea_n, S, A, pACD)
 }
 \arguments{
   \item{L}{length of the eye in millimeters (mm)}
 
   \item{R}{corneal radius of curvature (mm)}
 
-  \item{S}{IOL surgeon-factor constant (mm)}
-
   \item{K}{corneal power (D) used to determine corneal
   radius of curvature}
 
   \item{cornea_n}{corneal index of refraction used to
   determine corneal radius of curvature from K}
+
+  \item{S}{IOL surgeon-factor constant (mm)}
 
   \item{A}{IOL A constant (D) used to determine
   surgeon-factor}

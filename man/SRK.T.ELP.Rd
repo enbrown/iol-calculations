@@ -3,7 +3,7 @@
 \alias{SRK.T.ELP}
 \title{SRK/T Formula for IOL Effective Lens Position}
 \usage{
-SRK.T.ELP(L, K, ACD, A)
+SRK.T.ELP(L, K = 337.5/R, R = 337.5/K, ACD, A)
 }
 \arguments{
   \item{L}{axial length of the eye in millimeters (mm)}

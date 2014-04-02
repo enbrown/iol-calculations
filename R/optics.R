@@ -222,6 +222,27 @@ plot.Circle <- function(c, points = 100, around = NULL, ...) {
   lines(x = x, y = y, ...)
 }
 
+#' Intersect and Line and a vertical line
+#' 
+#' Internal function for ray-tracing 2D optics
+#' 
+#' @param line Line to intersect (treated as an infinite line)
+#' @param position Position of vertical line (x-coordinate) to intersect
+#' @return Point of intersection between the line and vertical line (or NA)
+#' @family optics
+#' @keywords internal
+IntersectLV <- function(line, position) {
+  stopifnot(class(line) == 'Line')
+  stopifnot(is.numeric(position) & is.finite(position))
+  if (line$A$X == line$B$X) {
+    return(NA)
+  }
+  dx <- line$B$X - line$A$X
+  dy <- line$B$Y - line$A$Y
+  Dx <- position - line$A$X
+  return(Point(x = position, y = line$A$Y + dy * Dx / dx))
+}
+
 #' Intersect and Line and Circle
 #' 
 #' Internal function for ray-tracing 2D optics
@@ -313,8 +334,8 @@ RefractLL <- function(line, normal, n1 = 1.0, n2 = 1.0, plot = TRUE, ...) {
     warning("NaN produced")
     return(NA)
   }
-  cat('Incident angle: ', angle1 * 180/pi, '\n')
-  cat('Refracted angle: ', angle2 * 180/pi, '\n')
+  #cat('Incident angle: ', angle1 * 180/pi, '\n')
+  #cat('Refracted angle: ', angle2 * 180/pi, '\n')
   
   normal <- normalize(center(normal))
   ray <- scale(normal, -1)
@@ -388,6 +409,102 @@ RefractLC <- function(line, circle, n1 = 1.0, n2 = 1.0, first = TRUE,
                    n1, n2, plot, ...))
 }
 
+#' Refract a line into a circle
+#' 
+#' Internal function for ray-tracing 2D optics.
+#' 
+#' Refracts a line into a circle by first computing the intersection of the line
+#' and the circle and then computing the surface normal of the circle at that 
+#' intersection point. The parameters first and inside choose whether the first
+#' (left/top) or second (right/bottom) intersection of the line with the circle
+#' is the chosen refraction surface. The inside parameter determines whether the
+#' refraction is taken as a ray intersecting in-to or out-of the circle.
+#' 
+#' @param line Infinite line to refract
+#' @param normal Normal of the refracting surface (the surface is located at the
+#'   normal's starting point)
+#' @param n1 Index of refraction for the incident ray
+#' @param n2 Index of refraction for the refracted ray
+#' @param first Whether to refract at the first intersection of the line and 
+#'   circle or the second.
+#' @param inside Whether the incident line is leaving the circle (starting 
+#'   inside) and the refracting ray is outside of the circle
+#' @param plot Whether to plot the incident ray, surface normal, and refracted 
+#'   ray
+#' @return The refracted ray with the starting point being the normal's starting
+#'   point (class Line)
+#' @family optics
+#' @keywords internal
+RefractThinLens <- function(line, diopters, position, plot = TRUE, ...) {
+  stopifnot(class(line) == 'Line')
+  stopifnot(is.numeric(diopters) & is.finite(diopters))
+  stopifnot(is.numeric(position) & is.finite(position))
+  pts <- IntersectLV(line, position)
+  if (class(pts) != 'Point') {
+    return(NA)
+  }
+  dx <- line$B$X - line$A$X
+  dy <- line$B$Y - line$A$Y
+  if (dx == 0) {
+    return(NA)
+  }
+  #cat("dx = ", dx, "  dy = ", dy, "\n")
+  if (pts$Y == 0.0) {
+    refracted <- Line(pts, Point(pts$X+1, pts$Y))
+  } else {
+    focal_distance <- -dx * pts$Y / dy
+    #cat("f = ", focal_distance, "\n")
+    vergence <- 1.0 / focal_distance
+    #cat("vergence = ", vergence, "\n")
+    vergence <- vergence + diopters
+    #cat("vergence = ", vergence, "\n")
+    focal_distance <- 1.0 / vergence
+    #cat("f = ", focal_distance, "\n")
+    if (! is.finite(focal_distance) | focal_distance > 1E10) {
+      refracted <- Line(pts, Point(pts$X + 1, pts$Y))
+    } else if (focal_distance > 0) {
+      refracted <- Line(pts, Point(pts$X + focal_distance, 0.0))
+    } else {
+      refracted <- Line(pts, Point(pts$X - focal_distance, 2.0 * pts$Y))
+    }
+  }
+  if (plot) {
+    plot(Line(Point(pts$X, pts$Y-1), Point(pts$X, pts$Y+1)), ...)
+  }
+  return(normalize(refracted))
+}
+
+test2 <- function() {
+  op <- par(mfrow=c(2,1))
+  plot(0, xlim=c(0,10), ylim=c(-6,6), type='n')
+  for (y in seq(-3,3,by=1)) {
+    a <- Line(Point(-1, y), Point(0,y))
+    b <- RefractThinLens(a, diopters = 1, pos = 0)
+    c <- RefractThinLens(b, diopters = 1, pos = 4)
+    plot(Line(Point(a$A$X, a$A$Y), Point(b$A$X, b$A$Y)))
+    plot(Line(Point(b$A$X, b$A$Y), Point(c$A$X, c$A$Y)))
+    plot(scale(normalize(c),10))
+  }
+  
+  plot(0, xlim=c(0,0.024), ylim=c(-0.01,0.01), type='n')
+  plot(Circle(Point(24.4/2/1000,0),24.4/2/1000))
+  for (y in seq(-0.005,0.005,by=0.001)) {
+    a <- Line(Point(-1, y), Point(0,y))
+    
+    b <- RefractThinLens(a, diopters = 43.05, pos = 0)
+    c <- RefractThinLens(b, diopters = 19.11 / 1.336, pos = 0.0057)
+    plot(Line(Point(a$A$X, a$A$Y), Point(b$A$X, b$A$Y)))
+    plot(Line(Point(b$A$X, b$A$Y), Point(c$A$X, c$A$Y)))
+    plot(scale(normalize(c),2))
+    
+    #r <- RefractThinLens(a, diopters = 58.20, pos = 0.0072)
+    #plot(Line(Point(a$A$X, a$A$Y), Point(r$A$X, r$A$Y)))
+    #plot(scale(normalize(r),2))
+    
+  }
+  par(op)
+}
+
 test <- function() {
   n1 <- 1.5
   n2 <- 2
@@ -421,14 +538,19 @@ test <- function() {
   }
 }
 
-eye <- function(y = 1, by = 0.5, angle = 0,
+eye <- function(y = 2.0, by = 0.5, angle = 0, Rx = -2.50, vertex = 12, zoom = 1.0,
                 AL = 24, 
                 cornea1 = 7.7, tcornea = 0.5, ncornea = 1.376, cornea2 = 6.8,
-                naqueous = 1.336, ACD = 3.6, 
+                naqueous = 1.336, ACD = 3.6,
+                lens = TRUE,
                 cortex1 = 10.0, tcortexA = 0.546, ncortex = 1.386,
                 nucleus1 = 7.911, tnucleus = 2.419, nnucleus = 1.406, nucleus2 = -5.76,
                 tcortexB = 0.635, cortex2 = -6,
-                nvitreous = 1.336, retina = -12) {
+                PCIOL = ! lens,
+                D = 24, ELP = 4.5,
+                nvitreous = 1.336, retina = -12,
+                ...) {
+  if (PCIOL) { lens <- FALSE }
   
   Cornea1 <- Circle(Point(x = cornea1, y = 0), radius = cornea1)
   Cornea2 <- Circle(Point(x = tcornea + cornea2, y = 0), radius = cornea2)
@@ -438,36 +560,114 @@ eye <- function(y = 1, by = 0.5, angle = 0,
   Cortex2 <- Circle(Point(x = ACD + tcortexA + tnucleus + tcortexB + cortex2, y = 0), radius = abs(cortex2))
   Retina <- Circle(Point(x = AL + retina, y = 0), radius = abs(retina))
   
-  par(mar = c(0,0,0,0))
-  plot(0, xlim=c(-1,AL), ylim=c(-AL/4,AL/4), type='n', asp = 1,
-       xaxt = 'n', xlab = '', yaxt = 'n', ylab = '')
+  par(mar = c(0,0,2,0), bty='n')
+  plot(0, xlim=c(AL-AL/zoom-1,AL), ylim=c(-AL/4/zoom,AL/4/zoom), type='n', asp = 1,
+       xaxt = 'n', xlab = '', yaxt = 'n', ylab = '', ...)
   plot(Cornea1, around = Line(Point(tcornea/2,-10),Point(tcornea/2,10)))
   plot(Cornea2, around = Line(Point(tcornea/2,-10),Point(tcornea/2,10)))
-  plot(Cortex1, around = Line(Point(ACD+tcortexA/2,-10),Point(ACD+tcortexA/2,10)))
-  plot(Nucleus1, around = Line(Point(ACD+tcortexA/2,-10),Point(ACD+tcortexA/2,10)))
-  plot(Nucleus2, around = Line(Point(ACD+tcortexA+tnucleus+tcortexB/2,-10),Point(ACD+tcortexA+tnucleus+tcortexB/2,10)))
-  plot(Cortex2, around = Line(Point(ACD+tcortexA+tnucleus+tcortexB/2,-10),Point(ACD+tcortexA+tnucleus+tcortexB/2,10)))
+  if (lens) {
+    # Draw the lens
+    plot(Cortex1, around = Line(Point(ACD+tcortexA/2,-10),Point(ACD+tcortexA/2,10)))
+    plot(Nucleus1, around = Line(Point(ACD+tcortexA/2,-10),Point(ACD+tcortexA/2,10)))
+    plot(Nucleus2, around = Line(Point(ACD+tcortexA+tnucleus+tcortexB/2,-10),Point(ACD+tcortexA+tnucleus+tcortexB/2,10)))
+    plot(Cortex2, around = Line(Point(ACD+tcortexA+tnucleus+tcortexB/2,-10),Point(ACD+tcortexA+tnucleus+tcortexB/2,10)))
+  } else {
+    # Draw the plane of the PCIOL
+    plot(Line(Point(ELP, -10), Point(ELP, 10)))
+  }
   plot(Retina, around = Line(Point(AL-2,-10),Point(AL-2,10)))
   for (y in seq(-y, y, by = by)) {
     plot <- FALSE
 
-    ray <- rotate(Line(Point(-1,y), Point(0,y)), angle * pi/180)
+    #ray <- rotate(Line(Point(-vertex,y), Point(-vertex+1,y)), angle * pi/180)
+    if (Rx < 0) {
+      f <- -1000/Rx + vertex
+      ray <- Line(Point(-f,0), Point(0, y))
+    } else if (Rx == 0) {
+      ray <- Line(Point(-vertex-100, y), Point(-vertex, y))
+    } else {
+      f <- -1000/Rx + vertex
+      ray <- Line(Point(f,2*y), Point(0, y))
+    }
     rayCorneaA <- RefractLC(ray, Cornea1, n1 = 1.0, n2 = ncornea, plot = plot)
     rayCorneaB <- RefractLC(rayCorneaA, Cornea2, n1 = ncornea, n2 = naqueous, plot = plot)
-    rayLensA <- RefractLC(rayCorneaB, Cortex1, n1 = naqueous, n2 = ncortex, plot = plot)
-    rayLensB <- RefractLC(rayLensA, Nucleus1, n1 = ncortex, n2 = nnucleus, plot = plot)
-    rayLensC <- RefractLC(rayLensB, Nucleus2, n1 = nnucleus, n2 = ncortex, inside = TRUE, first = FALSE, plot = plot)
-    rayLensD <- RefractLC(rayLensC, Cortex2, n1 = ncortex, n2 = nvitreous, inside = TRUE, first = FALSE, plot = plot)
-    rayRetina <- RefractLC(rayLensD, Retina, n1 = nvitreous, n2 = 100, inside=TRUE, first = FALSE, plot = plot)
+    if (lens) {
+      rayLensA <- RefractLC(rayCorneaB, Cortex1, n1 = naqueous, n2 = ncortex, plot = plot)
+      rayLensB <- RefractLC(rayLensA, Nucleus1, n1 = ncortex, n2 = nnucleus, plot = plot)
+      rayLensC <- RefractLC(rayLensB, Nucleus2, n1 = nnucleus, n2 = ncortex, inside = TRUE, first = FALSE, plot = plot)
+      rayLensD <- RefractLC(rayLensC, Cortex2, n1 = ncortex, n2 = nvitreous, inside = TRUE, first = FALSE, plot = plot)
+      rayRetina <- RefractLC(rayLensD, Retina, n1 = nvitreous, n2 = 100, inside=TRUE, first = FALSE, plot = plot)
+    } else {
+      rayPCIOL <- RefractThinLens(rayCorneaB, diopters = D / 1000 / nvitreous, position = ELP, plot = plot)
+      rayRetina <- RefractLC(rayPCIOL, Retina, n1 = nvitreous, n2 = 100, inside=TRUE, first = FALSE, plot = plot)
+    }
     
     plot(Line(ray$A, rayCorneaA$A))
     plot(Line(rayCorneaA$A, rayCorneaB$A), col = 'blue')
-    plot(Line(rayCorneaB$A, rayLensA$A))
-    plot(Line(rayLensA$A, rayLensB$A), col = 'red')
-    plot(Line(rayLensB$A, rayLensC$A), col = 'green')
-    plot(Line(rayLensC$A, rayLensD$A), col = 'red')
-    plot(Line(rayLensD$A, rayRetina$A))
+    if (lens) {
+      plot(Line(rayCorneaB$A, rayLensA$A))
+      plot(Line(rayLensA$A, rayLensB$A), col = 'red')
+      plot(Line(rayLensB$A, rayLensC$A), col = 'green')
+      plot(Line(rayLensC$A, rayLensD$A), col = 'red')
+      plot(Line(rayLensD$A, rayRetina$A))
+    } else {
+      plot(Line(rayCorneaB$A, rayPCIOL$A))
+      plot(Line(rayPCIOL$A, rayRetina$A))
+    }
     
     #plot(scale(rayLensD, AL))
   }  
+}
+
+case <- function() {
+  elp <- 5.65
+  # Model Eye
+  pdf("Case-model.pdf")
+  eye(main = "Model Eye")
+  dev.off()
+  # Pre-PRK
+  pdf("Case-pre-PRK.pdf")
+  eye(AL = 25.47, cornea1=337.5/40.93, tcornea=0.5, ACD=2.84, nnucleus=1.414, 
+      PCIOL = FALSE, Rx = -3.38, zoom = 1,
+      main = "Before PRK with -3.0 D Glasses")
+  dev.off()
+  # Post-PRK
+  pdf("Case-post-PRK.pdf")
+  eye(AL = 25.47, cornea1=337.5/38.93, tcornea=0.4, ACD=2.84, nnucleus=1.41, 
+      PCIOL = FALSE, Rx = +0.25, zoom = 1,
+      main = "After PRK with +0.25 D Glasses")
+  dev.off()
+  pdf("Case-post-PRK-zoomed.pdf")
+  eye(AL = 25.47, cornea1=337.5/38.93, tcornea=0.4, ACD=2.84, nnucleus=1.41, 
+      PCIOL = FALSE, Rx = +0.25, zoom = 10,
+      main = "After PRK with +0.25 D Glasses\n(zoomed on retina)")
+  dev.off()
+  # Wrong PCIOL, no Rx
+  pdf("Case-20D.pdf")
+  eye(AL = 25.47, cornea1=337.5/38.93, tcornea=0.4,
+      PCIOL = TRUE, ELP = elp + 3.4, D = 20.96, Rx = 0.0, zoom = 1,
+      main = "With +21.0 D PCIOL")
+  dev.off()
+  pdf("Case-20D-zoomed.pdf")
+  eye(AL = 25.47, cornea1=337.5/38.93, tcornea=0.4,
+      PCIOL = TRUE, ELP = elp + 3.4, D = 20.96, Rx = 0.0, zoom = 10,
+      main = "With +21.0 D PCIOL\n(zoomed on retina)")
+  dev.off()
+  # Wrong PCIOL, with glasses
+  pdf("Case-20D-glasses-zoomed.pdf")
+  eye(AL = 25.47, cornea1=337.5/38.93, tcornea=0.4,
+      PCIOL = TRUE, ELP = elp + 3.4, D = 20.96, Rx = 1.25, zoom = 10,
+      main = "With +21.0 D PCIOL and +1.25 D Glasses\n(zoomed on retina)")
+  dev.off()
+  # Correct PCIOL, no Rx
+  pdf("Case-23D.pdf")
+  eye(AL = 25.47, cornea1=337.5/38.93, tcornea=0.4,
+      PCIOL = TRUE, ELP = elp + 3.4, D = 22.93, Rx = 0.0, zoom = 1,
+      main = "With +23.0 D PCIOL")
+  dev.off()
+  pdf("Case-23D-zoomed.pdf")
+  eye(AL = 25.47, cornea1=337.5/38.93, tcornea=0.4,
+      PCIOL = TRUE, ELP = elp + 3.4, D = 22.93, Rx = 0.0, zoom = 10,
+      main = "With +23.0 D PCIOL\n(zoomed on retina)")
+  dev.off()
 }

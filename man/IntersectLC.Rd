@@ -19,14 +19,15 @@ line and circle
 Internal function for ray-tracing 2D optics
 }
 \seealso{
-Other optics: \code{\link{Circle}}; \code{\link{Line}};
+Other optics: \code{\link{Circle}};
+\code{\link{IntersectLV}}; \code{\link{Line}};
 \code{\link{Point}}; \code{\link{RefractLC}};
-\code{\link{RefractLL}}; \code{\link{angle}};
-\code{\link{center}}; \code{\link{length.Line}};
-\code{\link{normalize}}; \code{\link{orthogonal}};
-\code{\link{plot.Circle}}; \code{\link{plot.Line}};
-\code{\link{plot.Point}}; \code{\link{rotate}};
-\code{\link{scale}}
+\code{\link{RefractLL}}; \code{\link{RefractThinLens}};
+\code{\link{angle}}; \code{\link{center}};
+\code{\link{length.Line}}; \code{\link{normalize}};
+\code{\link{orthogonal}}; \code{\link{plot.Circle}};
+\code{\link{plot.Line}}; \code{\link{plot.Point}};
+\code{\link{rotate}}; \code{\link{scale}}
 }
 \keyword{internal}
 

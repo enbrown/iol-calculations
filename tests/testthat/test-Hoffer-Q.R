@@ -77,4 +77,44 @@ test_that("Hoffer-Q Equation (internal functions)", {
   elp <- IOL:::Hoffer.Q.ELP(L = L, K = K, pACD = pACD)
   iol <- IOL:::Hoffer.Q.Power(L = L, K = K, ELP = elp)
   expect_equivalent(round(iol, digits=2), -11.67)
+
+  L <- 12; K <- 40; pACD <- 4.97
+  elp <- IOL:::Hoffer.Q.ELP(L = L, K = K, pACD = 4.97)
+  iol <- IOL:::Hoffer.Q.Power(L = L, K = K, ELP = elp)
+  expect_equivalent(round(iol, digits=2), 114.73)
+  
+  })
+
+test_that("Hoffer-Q Equation (internal functions)", {
+  tests <- read.csv('tests.csv')
+  tests <- subset(tests, Method == 'Hoffer.Q')
+  f.elp <- IOL:::Hoffer.Q.ELP
+  f.iol <- IOL:::Hoffer.Q.Power
+  
+  arglist <- function(x){ 
+    z <- deparse(substitute(x))
+    nams <- names(x)
+    paste(sapply(seq_along(x), function(i) paste(names(x)[i], '=', x[[i]])),
+          collapse = ', ')
+  }
+  
+  for (i in 1:nrow(tests)) {
+    args <- tests[i,]
+    args <- args[,!is.na(args)]
+    elp <- do.call(f.elp, args[names(args) %in% names(formals(f.elp))])
+    if ('ELP' %in% names(args)) {
+      expect_equivalent(round(elp, digits = 2),
+                        round(args$ELP, digits = 2),
+                        info=arglist(c(line = i, args, got = elp)))
+    } else {
+      args$ELP <- elp[[1]]
+    }
+    args$ELP <- elp[[1]]
+    iol <- do.call(f.iol, args[names(args) %in% names(formals(f.iol))])
+    if ('Power' %in% names(args)) {
+      expect_equivalent(round(iol, digits = 2),
+                        round(args$Power, digits = 2),
+                        info=arglist(c(line = i, args, got = iol)))
+    }
+  }
 })

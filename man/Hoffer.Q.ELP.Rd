@@ -3,7 +3,7 @@
 \alias{Hoffer.Q.ELP}
 \title{Hoffer-Q Formula for Effective Lens Position}
 \usage{
-Hoffer.Q.ELP(L, K, pACD, A)
+Hoffer.Q.ELP(L, K = 337.5/R, R, pACD, A)
 }
 \arguments{
   \item{L}{length of the eye in millimeters (mm)}

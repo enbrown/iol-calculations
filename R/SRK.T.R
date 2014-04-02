@@ -13,7 +13,7 @@
 #' @return Effective lens position of IOL (mm)
 #' @seealso \code{\link{ELP}}
 #' @family ELP
-SRK.T.ELP <- function(L, K, ACD, A) {
+SRK.T.ELP <- function(L, K=337.5/R, R=337.5/K, ACD, A) {
   args <- list(L = L, K = K)
   if (missing(ACD) || ! is.finite(ACD)) {
     if (! missing(A) && is.finite(A)) {
@@ -25,7 +25,7 @@ SRK.T.ELP <- function(L, K, ACD, A) {
     }
   }
   # Corneal radius of curvature (mm)
-  R <- 337.5 / K
+  #R <- 337.5 / K
   # Corrected axial length (mm)
   LCOR <- L
   if (L > 24.2) {

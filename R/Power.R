@@ -21,28 +21,37 @@
 #' @family Power
 #' @author Eric N. Brown \email{eric.n.brown@@gmail.com}
 Power <- function(L, K, A, ELP, Rx = 0, V = 13, which = 'all') {
+  cl <- match.call()
   result <- list()
   if ('all' %in% which) {
     which <- names(Power.functions)
     which <- which[which != 'all']
   }
   if ('modern' %in% which) {
-    which <- c(which, 'SRK.T', 'Holladay.1', 'Hoffer.Q')
+    which <- c(which, 'SRK.T', 'Holladay.1', 'Hoffer.Q', 'Haigis')
     which <- which[which != 'modern']
   }
   which <- unique(which)
   for (i in which) {
-    if (i %in% c('SRK', 'SRK.II')) {
-      result[[i]] <- Power.functions[[i]](L = L, K = K, A = A)
-    } else if (i %in% c('Colenbrander', 'Fyodorov', 'van.der.Heijde', 'Binkhorst', 
-                        'Hoffer', 'Shammas', 'Binkhorst.adjusted',
-                        'SRK.T')) {
-      result[[i]] <- Power.functions[[i]](L = L, K = K, ELP = ELP)
-    } else if (i %in% c('Holladay', 'Holladay.1', 'Hoffer.Q')) {
-      result[[i]] <- Power.functions[[i]](L = L, K = K, ELP = ELP, Rx = Rx, V = V)
-    } else {
-      stop("Unknown IOL Power formula: '", i, "'")
+    if (is.null(Power.functions[[i]])) {
+      warning("Unknown Power method requested: ", i, ".")
+      next
     }
+    fct <- Power.functions[[i]]
+    args <- names(cl) %in% names(formals(fct))
+    args <- as.list(cl)[args]
+    result[[i]] <- do.call(fct, args)
+#     if (i %in% c('SRK', 'SRK.II')) {
+#       result[[i]] <- Power.functions[[i]](L = L, K = K, A = A)
+#     } else if (i %in% c('Colenbrander', 'Fyodorov', 'van.der.Heijde', 'Binkhorst', 
+#                         'Hoffer', 'Shammas', 'Binkhorst.adjusted',
+#                         'SRK.T')) {
+#       result[[i]] <- Power.functions[[i]](L = L, K = K, ELP = ELP)
+#     } else if (i %in% c('Holladay', 'Holladay.1', 'Hoffer.Q')) {
+#       result[[i]] <- Power.functions[[i]](L = L, K = K, ELP = ELP, Rx = Rx, V = V)
+#     } else {
+#       warning("Unknown IOL Power formula: '", i, "'")
+#     }
   }
   
   functions <- names(result)

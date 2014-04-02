@@ -9,16 +9,16 @@
 #' 
 #' @param L length of the eye in millimeters (mm)
 #' @param R corneal radius of curvature (mm)
-#' @param S IOL surgeon-factor constant (mm)
 #' @param K corneal power (D) used to determine corneal radius of curvature
 #' @param cornea_n corneal index of refraction used to determine corneal radius of curvature from K
+#' @param S IOL surgeon-factor constant (mm)
 #' @param A IOL A constant (D) used to determine surgeon-factor
 #' @param pACD IOL personalized ACD constant (mm) used to determine surgeon-factor
 #' @return ELP in mm
 #' @seealso \code{\link{ELP}}
 #' @family ELP
 #' @references \url{https://encrypted.google.com/books?id=NhWJsGFK6qgC&pg=PA8}
-Holladay.1.ELP <- function(L, R, S, K, cornea_n, A, pACD) {
+Holladay.1.ELP <- function(L, R, K, cornea_n, S, A, pACD) {
   args <- list(L = L)
   #https://encrypted.google.com/books?id=NhWJsGFK6qgC&pg=PA8&lpg=PA8&dq=colenbrander+formula&source=bl&ots=j__sC0XHHg&sig=DEaK9Qg0LOvedzq4itcfe7pBZ4Q&hl=en&sa=X&ei=scdlUuC1JcHP2wW90IDAAg&ved=0CD4Q6AEwAg#v=onepage&q=colenbrander%20formula&f=false
   if (missing(R) || ! is.finite(R)) {

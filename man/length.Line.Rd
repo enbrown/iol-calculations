@@ -13,9 +13,10 @@ Internal function for ray-tracing 2D optics
 }
 \seealso{
 Other optics: \code{\link{Circle}};
-\code{\link{IntersectLC}}; \code{\link{Line}};
-\code{\link{Point}}; \code{\link{RefractLC}};
-\code{\link{RefractLL}}; \code{\link{angle}};
+\code{\link{IntersectLC}}; \code{\link{IntersectLV}};
+\code{\link{Line}}; \code{\link{Point}};
+\code{\link{RefractLC}}; \code{\link{RefractLL}};
+\code{\link{RefractThinLens}}; \code{\link{angle}};
 \code{\link{center}}; \code{\link{normalize}};
 \code{\link{orthogonal}}; \code{\link{plot.Circle}};
 \code{\link{plot.Line}}; \code{\link{plot.Point}};

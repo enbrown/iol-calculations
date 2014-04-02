@@ -13,7 +13,7 @@
 #' @return ELP in mm
 #' @seealso \code{\link{ELP}}
 #' @family ELP
-Hoffer.Q.ELP <- function(L, K, pACD, A) {
+Hoffer.Q.ELP <- function(L, K=337.5/R, R, pACD, A) {
   args <- list(L = L, K = K)
   if (missing(pACD) || ! is.finite(pACD)) {
     pACD <- ELP.functions$Holladay(A)
@@ -56,7 +56,7 @@ ELP.functions$Hoffer.Q <- Hoffer.Q.ELP
 #' @return Power of emmetropic IOL (D)
 #' @seealso \code{\link{Power}}
 #' @family Power
-Hoffer.Q.Power <- function(L, K, ELP, Rx = 0, V = 13) {
+Hoffer.Q.Power <- function(L, K=337.5/R, R, ELP, Rx = 0, V = 13) {
   args <- list(L = L, K = K, ELP = ELP, Rx = Rx, V = V)
   R <- Rx / (1 - 0.012 * Rx)
   P <- 1336 / (L - ELP - 0.05) -
